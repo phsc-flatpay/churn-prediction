@@ -1,0 +1,41 @@
+# Fabric specific
+*.pbix
+*.pbit
+.tmp/
+.cache/
+
+# Data files
+*.csv
+*.parquet
+*.delta/
+data/
+
+# Credentials and secrets
+config/secrets.json
+*.env
+.env.*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Model artifacts (if large)
+models/*.pkl
+models/*.h5
+*.joblib
+
+# Logs
+logs/
+*.log
