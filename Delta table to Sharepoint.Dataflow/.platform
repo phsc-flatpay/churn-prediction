@@ -2,7 +2,8 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
   "metadata": {
     "type": "Dataflow",
-    "displayName": "df_lakehouse_to_sharepoint"
+    "displayName": "lakehouse_to_sharepoint",
+    "description": "Dataflow to store Delta Tables as Xslx in Sharepoint"
   },
   "config": {
     "version": "2.0",
