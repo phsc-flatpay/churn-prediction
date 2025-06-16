@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Dataflow",
+    "displayName": "Delta table to Sharepoint"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "f235b18d-83b7-9fc7-4688-beb14eeec9cb"
+  }
+}

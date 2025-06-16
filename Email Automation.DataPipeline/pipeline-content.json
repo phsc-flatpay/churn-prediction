@@ -1,0 +1,33 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "name": "Send Daily Churn Mail",
+        "type": "Office365Outlook",
+        "dependsOn": [],
+        "typeProperties": {
+          "inputs": {
+            "method": "post",
+            "path": "/v2/Mail",
+            "body": {
+              "Body": "<p>@{concat('Hey Patrick,<br><br>Here are today''s calling lists for ', formatDateTime(utcNow(),'yyyy-MM-dd'), '. You can find them here:<br>Low TPV: <a href=\"https://flatpaydk.sharepoint.com/:x:/s/Churn/EcjgGvt-cZhAi_NGXizxIowBdgoLIp--QbA51F1KdW-hvQ?e=kKuzaj\">link</a><br>Medium TPV: <a href=\"https://flatpaydk.sharepoint.com/:x:/s/Churn/EYyG3eK7ckNDnEHTXr9VMzQBgoR7UzpJYgzbsDg28Tws8w?e=GTz9xM\">link</a><br>High TPV: <a href=\"https://flatpaydk.sharepoint.com/:x:/s/Churn/EScxOBGPOOtGuq0PlL_rBaABHQ7hnW6YOBAl9SXfaHgWZA?e=eLlIsW\">link</a><br><br>Let me know if anything isn''t working as expected.<br><br>Best,<br>Philipp')}</p>",
+              "Importance": "Normal",
+              "Sensitivity": "",
+              "To": "pw@flatpay.dk",
+              "Subject": "@concat('Retention calling list (', formatDateTime(utcNow(),'yyyy-MM-dd'), ')')"
+            }
+          }
+        }
+      }
+    ],
+    "logicAppsConnectionPayload": {
+      "id": "/subscriptions/2453c675-67c5-4898-811a-ebe027e7c413/resourceGroups/connections-e03dbe51-4f30-4e31-a84f-647f6b831f58/providers/Microsoft.Web/connections/1_19c7b351-26bd-4842-a317-3bcc429669ed_82d464a2-7f03-40b7-bceb-b86993db826a",
+      "properties": {
+        "api": {
+          "name": "office365",
+          "id": "/subscriptions/2453c675-67c5-4898-811a-ebe027e7c413/providers/Microsoft.Web/locations/westeurope/managedApis/office365"
+        }
+      }
+    }
+  }
+}

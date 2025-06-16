@@ -1,0 +1,72 @@
+{
+  "formatVersion": "202502",
+  "computeEngineSettings": {},
+  "name": "auto email new",
+  "queryGroups": [],
+  "documentLocale": "en-US",
+  "queriesMetadata": {
+    "Churn_Predictions_high_TPV": {
+      "queryId": "fb0480e7-11ba-441c-b3eb-13a232f12501",
+      "queryName": "Churn_Predictions_high_TPV",
+      "loadEnabled": false
+    },
+    "Churn_Predictions_low_TPV": {
+      "queryId": "790b97b2-9339-4f92-ac69-72d68736eaaf",
+      "queryName": "Churn_Predictions_low_TPV",
+      "loadEnabled": false
+    },
+    "Churn_Predictions_high_TPV_DataDestination": {
+      "queryId": "d8129381-57ba-47d3-93fd-0c4e9eeb5fc1",
+      "queryName": "Churn_Predictions_high_TPV_DataDestination",
+      "isHidden": true,
+      "loadEnabled": false
+    },
+    "Churn_Predictions_high_TPV_DataDestinationTransform": {
+      "queryId": "f55abda5-9b0e-4785-8279-c76eef63d252",
+      "queryName": "Churn_Predictions_high_TPV_DataDestinationTransform",
+      "isHidden": true,
+      "loadEnabled": false
+    },
+    "Churn_Predictions_low_TPV_DataDestination": {
+      "queryId": "1ec08a54-e945-4cac-9905-aa7d747cb7c2",
+      "queryName": "Churn_Predictions_low_TPV_DataDestination",
+      "isHidden": true,
+      "loadEnabled": false
+    },
+    "Churn_Predictions_low_TPV_DataDestinationTransform": {
+      "queryId": "4a08e761-9a0f-4876-abc6-22c4285630cf",
+      "queryName": "Churn_Predictions_low_TPV_DataDestinationTransform",
+      "isHidden": true,
+      "loadEnabled": false
+    },
+    "Churn_Predictions_medium_TPV": {
+      "queryId": "eccee81d-c2f7-4307-96ea-f1cfb735c483",
+      "queryName": "Churn_Predictions_medium_TPV",
+      "loadEnabled": false
+    },
+    "Churn_Predictions_medium_TPV_DataDestination": {
+      "queryId": "5b46c9b9-3bb5-4969-aa81-6a6636666055",
+      "queryName": "Churn_Predictions_medium_TPV_DataDestination",
+      "isHidden": true,
+      "loadEnabled": false
+    },
+    "Churn_Predictions_medium_TPV_DataDestinationTransform": {
+      "queryId": "c2d6e11a-3820-40e1-b0e5-1ab128b9bfa0",
+      "queryName": "Churn_Predictions_medium_TPV_DataDestinationTransform",
+      "isHidden": true,
+      "loadEnabled": false
+    }
+  },
+  "connections": [
+    {
+      "path": "https://flatpaydk.sharepoint.com/sites/Churn",
+      "kind": "SharePoint",
+      "connectionId": "{\"ClusterId\":\"71a56c04-7d54-4ae0-b1cf-cf966629cf46\",\"DatasourceId\":\"753f627a-77a7-4820-8858-11b10b11a572\"}"
+    },
+    {
+      "path": "Lakehouse",
+      "kind": "Lakehouse",
+      "connectionId": "{\"ClusterId\":\"71a56c04-7d54-4ae0-b1cf-cf966629cf46\",\"DatasourceId\":\"5e018a7e-aa1d-4119-8b92-3e555d20eb85\"}"
+    }
+  ]
+}
