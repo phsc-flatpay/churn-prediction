@@ -67,18 +67,14 @@ from builtin.utils.storage  import get_storage_options
 from builtin.utils.paths    import PATHS
 from builtin.utils.cleaning import clean_phone
 
-# ------------------------------------------------------------------
 # Configuration
-# ------------------------------------------------------------------
 storage_options = get_storage_options()
 paths = PATHS
 
 # Lifetime-TPV filter (EUR)
 MIN_LIFETIME_TRX_EUR = 2_500
 
-# ------------------------------------------------------------------
 # Helper
-# ------------------------------------------------------------------
 def to_ns_utc(series: pd.Series) -> pd.Series:
     """Normalize timezone-aware datetime series to datetime64[ns, UTC]"""
     return (
@@ -88,9 +84,7 @@ def to_ns_utc(series: pd.Series) -> pd.Series:
         .dt.tz_localize("UTC")             # Apply UTC
     )
 
-# ------------------------------------------------------------------
 # Register raw Delta tables in DuckDB
-# ------------------------------------------------------------------
 con = duckdb.connect()
 
 raw_tables = [
@@ -106,9 +100,7 @@ for t in raw_tables:
     ds = DeltaTable(paths[t], storage_options=storage_options).to_pyarrow_dataset()
     con.register(f"{t}_table", ds)
 
-# ------------------------------------------------------------------
 # 1)  Build list of eligible mids  (Σ trx_amount_eur > threshold)
-# ------------------------------------------------------------------
 eligible_mids = (
     con.execute("""
         SELECT  t_mid AS mid
@@ -122,9 +114,7 @@ eligible_mids = (
 )
 print(f"Eligible merchants: {len(eligible_mids)}")
 
-# ------------------------------------------------------------------
 # 2)  Load & merge merchant master data  (immediately filter)
-# ------------------------------------------------------------------
 master_cols = [
     "mid", "friendly_name", "activation_date", "deactived_date",
     "active", "phonenumber", "created",
@@ -141,9 +131,7 @@ df_master = con.execute(f"""
 df_master = df_master[df_master["mid"].isin(eligible_mids)]
 df_master.drop("acquire", axis=1, inplace=True)
 
-# ------------------------------------------------------------------
 # 3)  Helloflow enrichment
-# ------------------------------------------------------------------
 hf_cols = [
     "mid", "company_name", "friendly_name", "phonenumber",
     "cancel_date", "datetime", "meeting_type_id", "terminals",
@@ -157,14 +145,10 @@ df_hf = con.execute(f"""
 df_master = df_master.merge(df_hf, on="mid", how="left", suffixes=("", "_hf"))
 print("After merchant master merge:", df_master.shape)
 
-# ------------------------------------------------------------------
 # 4)  Clean phone numbers
-# ------------------------------------------------------------------
 df_master["phone_clean"] = df_master["phonenumber"].apply(clean_phone)
 
-# ------------------------------------------------------------------
 # 5)  Aggregate call logs (unchanged)
-# ------------------------------------------------------------------
 df_calls_raw = con.execute("""
     SELECT 
        cl.id           AS call_id,
@@ -193,10 +177,8 @@ df_calls_agg = (
 df_calls_agg["call_day"] = to_ns_utc(df_calls_agg["call_day"])
 print("Aggregated calls shape:", df_calls_agg.shape)
 
-# ------------------------------------------------------------------
 # 6)  Aggregate transactions (t_mid → mid, trx_amount_eur)
 #     and apply the mid filter defensively
-# ------------------------------------------------------------------
 df_tx = con.execute("""
     SELECT
         mid,
@@ -214,9 +196,7 @@ df_tx["call_day"] = to_ns_utc(pd.to_datetime(df_tx["call_day"], utc=True))
 
 print("Aggregated transactions shape:", df_tx.shape)
 
-# ------------------------------------------------------------------
 # 7)  Compute last activity dates
-# ------------------------------------------------------------------
 df_last_call = (
     df_calls_agg.dropna(subset=["call_day"])
     .groupby("phone_clean", as_index=False)["call_day"]
@@ -244,9 +224,7 @@ df_master = df_master.merge(
 )
 print("After last_activity merge:", df_master.shape)
 
-# ------------------------------------------------------------------
 # 8)  Build merchant-day skeleton (unchanged)
-# ------------------------------------------------------------------
 df_master["activation_date"] = pd.to_datetime(df_master["activation_date"], utc=True, errors="coerce")
 df_master["deactived_date"] = pd.to_datetime(df_master["deactived_date"], utc=True, errors="coerce")
 
@@ -284,9 +262,7 @@ df_skeleton = pd.DataFrame(rows, columns=["mid", "call_day"])
 df_skeleton["call_day"] = to_ns_utc(pd.to_datetime(df_skeleton["call_day"], utc=True, errors="coerce"))
 print("Skeleton shape:", df_skeleton.shape)
 
-# ------------------------------------------------------------------
 # 9)  Merge activity onto skeleton
-# ------------------------------------------------------------------
 df_skel_calls = pd.merge(
     df_skeleton,
     df_calls_agg,
@@ -306,9 +282,7 @@ df_skel = pd.merge(
 )
 df_skel["total_amount"] = df_skel["total_amount"].fillna(0)
 
-# ------------------------------------------------------------------
 # 10)  Merge merchant attributes
-# ------------------------------------------------------------------
 merchant_core_cols = [
     "mid", "activation_date", "deactived_date", "active",
     "pause_reason", "pause_without_usages_list", "transaction_fee",
@@ -320,9 +294,7 @@ df_master_core = df_master[merchant_core_cols].drop_duplicates("mid", keep="firs
 df_final = pd.merge(df_skel, df_master_core, on="mid", how="left")
 df_final.sort_values("call_day", inplace=True)
 
-# ------------------------------------------------------------------
 # 11)  Feature engineering (unchanged logic)
-# ------------------------------------------------------------------
 df_final["pause_reason"] = df_final["pause_reason"].fillna("no_pause").replace("", "no_pause")
 pause_dummies = pd.get_dummies(df_final["pause_reason"], prefix="pause_reason")
 df_final = pd.concat([df_final, pause_dummies], axis=1)
@@ -494,9 +466,7 @@ churned_merchants = df_final.loc[df_final["churn_tomorrow"] == 1, "mid"].nunique
 print(f"Total merchants: {unique_merchants}")
 print(f"Churned merchants: {churned_merchants} ({churned_merchants/unique_merchants:.2%})")
 
-# ------------------------------------------------------------------
 # 12)  Write final feature table
-# ------------------------------------------------------------------
 write_deltalake(
     paths["churn_features"],
     pa.Table.from_pandas(df_final),
@@ -511,6 +481,16 @@ df_validation = DeltaTable(
     paths["churn_features"], storage_options=storage_options
 ).to_pandas()
 print("Validation - read back shape:", df_validation.shape)
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "jupyter_python"
+# META }
+
+# CELL ********************
 
 
 # METADATA ********************

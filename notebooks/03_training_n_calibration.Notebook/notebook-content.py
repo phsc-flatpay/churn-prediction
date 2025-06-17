@@ -71,6 +71,7 @@ from builtin.utils.metrics_utils import (
     capacity_pct, precision_at_k, lift_at_k, expected_profit,
     AVG_LOSS_PER_CHURN, CAMPAIGN_COST_PER_CALL)
 
+
 # Fabric resource imports — shared utilities
 from builtin.utils.storage import get_storage_options
 from builtin.utils.paths   import PATHS
@@ -311,27 +312,62 @@ lift_clf = LiftOptimizedCalibratedClassifier(
                fixed_threshold=best_thr          # ← use profit threshold
            ).fit(df_C[feature_cols], df_C[label_col])
 
-# 8) Save Artifacts
+
+def plot_cumulative_gains_lift(y_true, y_prob, top_percent=0.02):
+    dfv = pd.DataFrame({"label": y_true, "prob": y_prob}) \
+             .sort_values("prob", ascending=False) \
+             .reset_index(drop=True)
+
+    total_churners = dfv["label"].sum()
+    total          = len(dfv)
+
+    dfv["cum_churners"] = dfv["label"].cumsum()
+    dfv["cum_pct_pop"]  = (dfv.index + 1) / total
+    dfv["cum_pct_chr"]  = dfv["cum_churners"] / total_churners
+
+    # Gains
+    plt.figure()
+    plt.plot(dfv["cum_pct_pop"]*100, dfv["cum_pct_chr"]*100, label="Model")
+    plt.plot([0, 100], [0, 100], "--", label="Random")
+    plt.xlabel("% of Population")
+    plt.ylabel("% of Churners Captured")
+    plt.legend(); plt.grid(True)
+
+    # Lift
+    lift_vals = dfv["cum_pct_chr"] / dfv["cum_pct_pop"]
+    plt.figure()
+    plt.plot(dfv["cum_pct_pop"]*100, lift_vals, label="Lift")
+    plt.axhline(1, ls="--"); plt.xlabel("% of Population"); plt.ylabel("Lift")
+    plt.legend(); plt.grid(True)
+
+    # Print lift at top X %
+    cutoff = int(total * top_percent)
+    captured = dfv.loc[:cutoff-1, "label"].sum()
+    frac = captured / total_churners if total_churners else 0
+    lift_at_top = frac / top_percent if top_percent else np.nan
+    print(f"Top {top_percent*100:.1f}% captures {frac*100:.2f}% of churners → Lift {lift_at_top:.2f}")
+
+# gains + lift chart
+last_fold_test = folds[-1][1]                         # boolean mask
+probs_last = lift_clf.predict_proba(
+    df_C.loc[last_fold_test, feature_cols]
+)[:, 1]
+
+plot_cumulative_gains_lift(
+    df_C.loc[last_fold_test, label_col],
+    probs_last,
+    top_percent=0.02
+)
+
+
+# 8) Persist Artifacts
 joblib.dump(feature_cols, paths["training_columns"])
 joblib.dump(lift_clf,     paths["model_artifact"])
 joblib.dump({"threshold": best_thr,
              "capacity_pct": CAPACITY_TOP_PCT},
             paths["threshold_meta"])
-logger.info("Saved training_columns to: %s", paths['training_columns'])
-logger.info("Saved calibrated model to: %s", paths['model_artifact'])
-
-# 9) Save raw XGBoost classifier and SHAP explainer for direct use in Notebook 4
-# Extract raw classifier from pipeline
-xgb_clf = pipe_full.named_steps['xgb']
-joblib.dump(xgb_clf, paths.get('xgb_model_unwrapped', '/lakehouse/default/Files/xgb_model_unwrapped.joblib'))
-logger.info("Saved unwrapped XGBClassifier to: %s", paths.get('xgb_model_unwrapped'))
-
-# Create and save SHAP TreeExplainer
-import shap
-explainer = shap.TreeExplainer(xgb_clf)
-joblib.dump(explainer, paths.get('shap_explainer', '/lakehouse/default/Files/shap_explainer.joblib'))
-logger.info("Saved SHAP TreeExplainer to: %s", paths.get('shap_explainer'))
-
+print("Saved training_columns to:", paths['training_columns'])
+print("Saved calibrated model to:", paths['model_artifact'])
 
 # METADATA ********************
 
