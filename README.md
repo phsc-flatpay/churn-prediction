@@ -12,7 +12,7 @@ This repository contains the Microsoft Fabric implementation of our customer chu
 1. Clone this repository
 2. Import into Microsoft Fabric workspace
 3. Configure Lakehouse connections
-(4. Set up email automation credentials)
+4. (Set up email automation credentials)
 
 ## Development Workflow
 1. Create feature branch from `develop`
