@@ -10,10 +10,10 @@
             "method": "post",
             "path": "/v2/Mail",
             "body": {
-              "Body": "<p>@{concat('Hey Patrick,<br><br>Here are today''s calling lists for ', formatDateTime(utcNow(),'yyyy-MM-dd'), '. You can find them here:<br>Low TPV: <a href=\"https://flatpaydk.sharepoint.com/:x:/s/Churn/EcjgGvt-cZhAi_NGXizxIowBdgoLIp--QbA51F1KdW-hvQ?e=kKuzaj\">link</a><br>Medium TPV: <a href=\"https://flatpaydk.sharepoint.com/:x:/s/Churn/EYyG3eK7ckNDnEHTXr9VMzQBgoR7UzpJYgzbsDg28Tws8w?e=GTz9xM\">link</a><br>High TPV: <a href=\"https://flatpaydk.sharepoint.com/:x:/s/Churn/EScxOBGPOOtGuq0PlL_rBaABHQ7hnW6YOBAl9SXfaHgWZA?e=eLlIsW\">link</a><br><br>Let me know if anything isn''t working as expected.<br><br>Best,<br>Philipp')}</p>",
+              "Body": "<p>@{concat('Good Morning Patrick,<br><br>Here are today''s calling lists for ', formatDateTime(utcNow(),'yyyy-MM-dd'), '. You can find them here:<br>Low TPV: <a href=\"https://flatpaydk.sharepoint.com/:x:/s/Churn/EcjgGvt-cZhAi_NGXizxIowBdgoLIp--QbA51F1KdW-hvQ?e=kKuzaj\">link</a><br>Medium TPV: <a href=\"https://flatpaydk.sharepoint.com/:x:/s/Churn/EYyG3eK7ckNDnEHTXr9VMzQBgoR7UzpJYgzbsDg28Tws8w?e=GTz9xM\">link</a><br>High TPV: <a href=\"https://flatpaydk.sharepoint.com/:x:/s/Churn/EScxOBGPOOtGuq0PlL_rBaABHQ7hnW6YOBAl9SXfaHgWZA?e=eLlIsW\">link</a><br><br>Let me know if anything isn''t working as expected.<br><br>Best,<br>Philipp')}</p>",
               "Importance": "Normal",
               "Sensitivity": "",
-              "To": "pw@flatpay.dk",
+              "To": "pw@flatpay.dk; kha@flatpay.dk",
               "Subject": "@concat('Retention calling list (', formatDateTime(utcNow(),'yyyy-MM-dd'), ')')"
             }
           }
